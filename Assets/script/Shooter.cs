@@ -13,23 +13,20 @@ public class Shooter : MonoBehaviour
 	private Vector3 m_mouseStartPoint;
 	private Vector3 m_mouseEndPoint;
 
-	private Vector3 m_defaultPos;
-
 	private Rigidbody m_shot;
+
+	public Camera m_camera;
 
 	private float m_angle;
 	private bool m_gameOver;
 	private int m_score ;
 	private int m_lastscore;
-	GUIStyle localStyle ;
 
 	private float delay;
 
 	void Start(){
 		m_shotPos.rotation = Quaternion.Euler(345,-270,0);
-		m_defaultPos = m_shotPos.position;
 		m_score = 0;
-		//Point m_shot x = position x of mouse
 	}
 	
 	void Update ()
@@ -56,14 +53,19 @@ public class Shooter : MonoBehaviour
 			m_shotPos.rotation = Quaternion.Euler(330,-270,0); // set to default rotation
 			m_hasClick = true ;
 			m_mouseStartPoint = Input.mousePosition;
-			
+
+		//	Debug.Log(Input.mousePosition);
+			// Create object at mouse point
 			Vector3 pos = new Vector3( m_mouseStartPoint.x, m_mouseStartPoint.y, 15);
 			Vector3 objPos = Camera.main.ScreenToWorldPoint(pos);
+		
 			m_shot = Instantiate(m_projectile, objPos, m_shotPos.rotation) as Rigidbody;
 			m_shot.useGravity = false;
+		//	gameObject.GetComponent<Drawline>().SetOrigin(objPos);
+		//	gameObject.GetComponent<Drawline>().setDraw(true);
 			//Debug.Log("START");
 		}
-		else if(m_hasClick && Input.GetMouseButtonUp(0)){
+		if(m_hasClick && Input.GetMouseButtonUp(0)){
 			m_shot.useGravity = true;
 			m_hasClick = false;
 			m_mouseEndPoint = Input.mousePosition;
@@ -72,20 +74,25 @@ public class Shooter : MonoBehaviour
 			if(m_mouseEndPoint.y >= m_mouseStartPoint.y){	
 				
 				// Rotate to end point of mouse
-				m_angle = Calm_angle();
+				m_angle = Cal_angle(m_mouseStartPoint,m_mouseEndPoint);
 				//Debug.Log(m_angle);
 				m_shotPos.rotation = Quaternion.Euler(330,-270-m_angle,0);
 				
 				m_shot.AddForce(m_shotPos.forward * m_distance * m_shotForce);
-				m_shotPos.position = m_defaultPos;
 				m_shot.GetComponent<DeleteSelf>().SetDestroy(true);
 				m_score++;
+				gameObject.GetComponent<Drawline>().setDraw(false);
 			}
 		}
 	}
 
-	float Calm_angle(){
-		return Mathf.Atan2(m_mouseEndPoint.y - m_mouseStartPoint.y,m_mouseEndPoint.x - m_mouseStartPoint.x) * 180f / 3.14f;
+	float Cal_angle(Vector3 origin, Vector3 dest){
+
+		float x = Mathf.Atan2(dest.y - origin.y,dest.x - origin.x) * 180f / 3.14f;
+		Debug.Log (x);
+
+		return x;
+
 	}
 
 	void StoreHighscore(int newHighscore)
