@@ -3,7 +3,7 @@ using System.Collections;
 
 public class Shooter : MonoBehaviour
 {
-	public Rigidbody m_projectile;
+	public Rigidbody m_projectile; // Prefab for throw
 	public Transform m_shotPos;
 	[Range(1.0f, 100.0f)]
 	public float m_shotForce = 2f;
@@ -13,7 +13,7 @@ public class Shooter : MonoBehaviour
 	private Vector3 m_mouseStartPoint;
 	private Vector3 m_mouseEndPoint;
 
-	private Rigidbody m_shot;
+	private Rigidbody m_shot; // object use to throw
 
 	public Camera m_camera;
 
@@ -22,7 +22,7 @@ public class Shooter : MonoBehaviour
 	private int m_score ;
 	private int m_lastscore;
 
-	private float delay;
+	private float delay; // delay for end games
 
 	void Start(){
 		m_shotPos.rotation = Quaternion.Euler(345,-270,0);
@@ -48,23 +48,20 @@ public class Shooter : MonoBehaviour
 	}
 
 	void Shot(){
-	//	Debug.Log ("START");
+		// Check for mouse press
 		if(Input.GetMouseButtonDown(0) && !m_hasClick){
 			m_shotPos.rotation = Quaternion.Euler(330,-270,0); // set to default rotation
-			m_hasClick = true ;
+			m_hasClick = true ; 
 			m_mouseStartPoint = Input.mousePosition;
 
-		//	Debug.Log(Input.mousePosition);
 			// Create object at mouse point
 			Vector3 pos = new Vector3( m_mouseStartPoint.x, m_mouseStartPoint.y, 15);
 			Vector3 objPos = Camera.main.ScreenToWorldPoint(pos);
 		
 			m_shot = Instantiate(m_projectile, objPos, m_shotPos.rotation) as Rigidbody;
-			m_shot.useGravity = false;
-		//	gameObject.GetComponent<Drawline>().SetOrigin(objPos);
-		//	gameObject.GetComponent<Drawline>().setDraw(true);
-			//Debug.Log("START");
+			m_shot.useGravity = false; // use for give object don't fall down
 		}
+		// Check for mouse don't press
 		if(m_hasClick && Input.GetMouseButtonUp(0)){
 			m_shot.useGravity = true;
 			m_hasClick = false;
@@ -75,11 +72,13 @@ public class Shooter : MonoBehaviour
 				
 				// Rotate to end point of mouse
 				m_angle = Cal_angle(m_mouseStartPoint,m_mouseEndPoint);
-				//Debug.Log(m_angle);
 				m_shotPos.rotation = Quaternion.Euler(330,-270-m_angle,0);
-				
+
+				// Throw ball
 				m_shot.AddForce(m_shotPos.forward * m_distance * m_shotForce);
 				m_shot.GetComponent<DeleteSelf>().SetDestroy(true);
+
+				//Count number ball that throw
 				m_score++;
 				gameObject.GetComponent<Drawline>().setDraw(false);
 			}
@@ -95,6 +94,7 @@ public class Shooter : MonoBehaviour
 
 	}
 
+	//Check for high score
 	void StoreHighscore(int newHighscore)
 	{
 		int oldHighscore = PlayerPrefs.GetInt("highscore", 10000);    
@@ -102,6 +102,7 @@ public class Shooter : MonoBehaviour
 			PlayerPrefs.SetInt("highscore", newHighscore);
 	}
 
+	//Create Label show scores
 	void OnGUI(){
 		GUIStyle myStyle = new GUIStyle();
 		myStyle.fontSize = 30;
