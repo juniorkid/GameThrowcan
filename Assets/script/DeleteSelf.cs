@@ -4,26 +4,34 @@ using System.Collections;
 public class DeleteSelf : MonoBehaviour {
 
 	// Use this for initialization
-	public bool m_destroy = false;
-	private float delay = 10f;
+	private bool m_destroy = false;
+	public float m_delay;
 	
 	void OnCollisionEnter (Collision col)
 	{
 		m_destroy = true;
-		delay = 10f;
+		m_delay = 4f;
 	}
 
-	IEnumerator DestroyObj(){
-		yield return new WaitForSeconds(4);
+	public IEnumerator DestroyObj(){
+		yield return new WaitForSeconds(m_delay);
 		Destroy (gameObject);
-	}
+	}	
 
 	public void SetDestroy(bool destroy){
 		m_destroy = destroy;
 	}
 
+	public void SetDelay(float delay){
+		m_delay = delay;
+	}
+
 	void Update(){
-		if(m_destroy || delay <= 0)
-			StartCoroutine (DestroyObj());	
+		if (m_destroy) {
+			StartCoroutine (DestroyObj ());
+		}
+
+		if(transform.position.y < -50 || transform.position.z > 150)
+			Destroy (gameObject);
 	}
 }

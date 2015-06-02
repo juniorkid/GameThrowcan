@@ -1,10 +1,11 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\script\ShowScore.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="..\RunRun\Assets\Script\Movement.cs">
     <Files>
-      <File FileName="Assets\script\Drawline.cs" Line="12" Column="50" />
-      <File FileName="Assets\script\Shooter.cs" Line="25" Column="22" />
-      <File FileName="Assets\script\ShowScore.cs" Line="12" Column="27" />
+      <File FileName="..\RunRun\Assets\Script\Movement.cs" Line="56" Column="29" />
+      <File FileName="..\RunRun\Assets\Script\PlayerDie.cs" Line="16" Column="63" />
+      <File FileName="..\RunRun\Assets\Script\BGScroller.cs" Line="24" Column="25" />
+      <File FileName="..\RunRun\Assets\Script\CreateFloor.cs" Line="61" Column="4" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
