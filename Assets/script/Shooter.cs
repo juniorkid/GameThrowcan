@@ -66,9 +66,10 @@ public class Shooter : MonoBehaviour
 			else
 				m_distance = 0;
 
-			if(m_distance > 500f)
-				m_distance = 500;
+			if(m_distance > Screen.height * 0.65f)
+				m_distance = Screen.height * 0.65f;
 
+			Debug.Log(m_distance);
 			//Check if position mouse < start mouse don't show line
 			if(Input.mousePosition.y >= m_mouseStartPoint.y){
 			//	Debug.Log("UPPP");
@@ -153,13 +154,14 @@ public class Shooter : MonoBehaviour
 		myStyle.normal.textColor=Color.red;
 		myStyle.fontSize = 50;
 
-		if (m_distance >= 500) {
+		// Set x y for create Text Max Force
+		if (m_distance >= (Screen.height * 0.65f) - 5) {
 			if (Screen.height - m_mouseStartPoint.y - 10 > Screen.height - 50)
 				y = Screen.height - 50;
 			else {
 				y = Screen.height - m_mouseStartPoint.y - 10;
 			}
-			Debug.Log(y);
+
 			x = m_mouseStartPoint.x - 110;
 			GUI.Label (new Rect ( x, y, 100, 100), "Max Force" , myStyle);
 		}
