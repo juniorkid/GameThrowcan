@@ -5,7 +5,8 @@ public class DestroyCan : MonoBehaviour {
 
 	// Use this for initialization
 	private bool m_stay = true;
-	
+
+	private int m_can = 0;
 
 	private float delay = 0f;
 
@@ -31,10 +32,22 @@ public class DestroyCan : MonoBehaviour {
 	
 	void Update(){
 		if (!m_stay) {
-		//	Debug.Log ("DELETE");
 			delay -= Time.deltaTime;
-			if (delay <= 0)
+			if (delay <= 0){
+				m_can = PlayerPrefs.GetInt("Can");
+				m_can++;
+				PlayerPrefs.SetInt ("Can", m_can);
 				Destroy (gameObject);
+			}
 		}
+
+		if (transform.position.y < -50) {
+			m_can = PlayerPrefs.GetInt("Can");
+			m_can++;
+			PlayerPrefs.SetInt ("Can", m_can);
+			Destroy (gameObject);
+		}
+
+
 	}
 }

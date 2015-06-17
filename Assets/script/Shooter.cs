@@ -20,99 +20,170 @@ public class Shooter : MonoBehaviour
 	private int m_score ;
 	private int m_lastscore;
 
+	private float m_timeStart;
+	private float m_timeStop;
+
+	private bool m_hasCreate;
+	
 	void Start(){
+
+		Time.timeScale = 1.15f;
+
+		m_shot = Instantiate(m_projectile, new Vector3(0f, -5.5f, 15), m_shotPos.rotation) as Rigidbody;
+		m_shot.useGravity = false;
+
 		m_shotPos.rotation = Quaternion.Euler(345,-270,0);
 		m_score = 0;
+
+		m_hasCreate = false;
+
+		PlayerPrefs.SetInt ("Can", 0);
 	}
 	
 	void Update ()
 	{
 		m_gameOver = gameObject.GetComponent<GameOver> ().GetGameOver ();
-		if (!m_gameOver) {
-			//Debug.Log ("TEST");
-			Shot ();
-		}
-		else {
-			StoreHighscore (m_score);
-			StartCoroutine(GoMenu());
+
+			if (!m_gameOver) {
+				if(m_shot != null){
+					//Debug.Log ("TEST");
+					Shot ();
+				}
+				else if(!m_hasCreate){
+					Debug.Log ("NEW BALL");
+					StartCoroutine(CraeteBall());
+					m_hasCreate = true;
+					m_hasClick = false;
+				}
+			} else {
+			//	StoreHighscore (m_score);
+				StartCoroutine (GoMenu ());
+			}
+	}
+
+	private IEnumerator CraeteBall(){
+		m_score++;
+		yield return new WaitForSeconds (0.5f);
+		if (m_score == 55) {
+			gameObject.GetComponent<GameOver> ().SetGameover (true);
+		} else {
+			m_shot = Instantiate (m_projectile, new Vector3 (0f, -5.5f, 15), m_shotPos.rotation) as Rigidbody;
+			m_shot.useGravity = false;
+			m_hasCreate = false;
 		}
 	}
 
 	void Shot(){
-		// Check for mouse press
-		if(Input.GetMouseButtonDown(0) && !m_hasClick){
-			m_shotPos.rotation = Quaternion.Euler(330,-270,0); // set to default rotation
-			m_hasClick = true ; 
-			m_mouseStartPoint = Input.mousePosition;
 
-			// Create object at mouse point
-			Vector3 pos = new Vector3( m_mouseStartPoint.x, m_mouseStartPoint.y, 15);
-			Vector3 objPos = Camera.main.ScreenToWorldPoint(pos);
-			m_shot = Instantiate(m_projectile, objPos, m_shotPos.rotation) as Rigidbody;
-			m_shot.useGravity = false; // use for give object don't fall down
+		if (m_shot.GetComponent<DragBall> ().GetShot () && !m_hasClick) {
 
-			//Draw Line Start Position
-			gameObject.GetComponent<Drawline>().SetOrigin(objPos);
+			m_hasClick = true;
+
+			m_mouseStartPoint = m_shot.GetComponent<DragBall> ().GetMousePosition ();
+			m_timeStart = Time.realtimeSinceStartup;
+			Vector3 objPos = Camera.main.ScreenToWorldPoint (m_mouseStartPoint);
+
+			objPos.y = -5.5f;
+
+			gameObject.GetComponent<Drawline> ().SetOrigin (objPos);
 
 		}
-
-		if(m_hasClick){
-			Vector3 pos = new Vector3( Input.mousePosition.x, Input.mousePosition.y, 15);
-			Vector3 objPos = Camera.main.ScreenToWorldPoint(pos);
-
-			//Draw Line End Position
-			if(Input.mousePosition.y >= m_mouseStartPoint.y)
-				m_distance = Vector3.Distance(m_mouseStartPoint, Input.mousePosition);
-			else
-				m_distance = 0;
-
-			if(m_distance > Screen.height * 0.65f)
-				m_distance = Screen.height * 0.65f;
-
-			Debug.Log(m_distance);
-			//Check if position mouse < start mouse don't show line
-			if(Input.mousePosition.y >= m_mouseStartPoint.y){
-			//	Debug.Log("UPPP");
-				gameObject.GetComponent<Drawline>().SetEnable(true);
-				gameObject.GetComponent<Drawline>().SetColor(m_distance/500f);
-				gameObject.GetComponent<Drawline>().SetDestination(objPos);
-			}
-			else 
-				gameObject.GetComponent<Drawline>().SetEnable(false);
-		}
-
-
-
-		// Release mouse button for Throw
-		if(m_hasClick && Input.GetMouseButtonUp(0)){
-			m_shot.useGravity = true;
+		if (!m_shot.GetComponent<DragBall> ().GetShot ()) {
 			m_hasClick = false;
-			m_mouseEndPoint = Input.mousePosition;
-			//If  Origin equal Destination Delete ball
-			if(m_distance == 0){
-				m_shot.GetComponent<DeleteSelf>().SetDestroy(true);
-				m_shot.GetComponent<DeleteSelf>().SetDelay(0.1f);
+			//	Debug.Log("AAA " + m_hasClick);
+		}
+
+		if (m_hasClick) {
+
+			float time;
+			float force;
+			float angleByTime;
+
+			//	Debug.Log("BBB " + m_hasClick);
+
+			//	Debug.Log ("AIMMING");
+
+			Vector3 pos = new Vector3 (Input.mousePosition.x, Input.mousePosition.y, 15);
+			Vector3 objPos = Camera.main.ScreenToWorldPoint (pos);
+			
+			//Draw Line End Position
+			if (pos.y >= m_mouseStartPoint.y)
+				m_distance = Vector3.Distance (m_mouseStartPoint, pos);
+			else {
+				m_distance = 0;
 			}
 
-			else if(m_mouseEndPoint.y >= m_mouseStartPoint.y){	
+			m_timeStop = Time.realtimeSinceStartup;
+			
+			time = m_timeStop - m_timeStart;
+			
+			force = m_distance / time;
 
-				m_shot.GetComponent<DeleteSelf>().SetDestroy(true);
-				m_shot.GetComponent<DeleteSelf>().SetDelay(5f);
+			//Check if position mouse < start mouse don't show line
 
+			if (Input.mousePosition.y >= m_mouseStartPoint.y) {
+				//	Debug.Log("UPPP");
+				gameObject.GetComponent<Drawline> ().SetEnable (true);
+				gameObject.GetComponent<Drawline> ().SetColor (force / 6000f);
+				gameObject.GetComponent<Drawline> ().SetDestination (objPos);
+			} else 
+				gameObject.GetComponent<Drawline> ().SetEnable (false);
+
+			if (Input.GetMouseButtonUp (0)) {
+
+			
+				m_hasClick = false;
+				m_mouseEndPoint = Input.mousePosition;
+
+				//If  Origin equal Destination Delete ball
+				if (m_mouseEndPoint.y >= m_mouseStartPoint.y && m_distance != 0) {	
+				
 					// Rotate to end point of mouse
-				m_angle = Cal_angle(m_mouseStartPoint,m_mouseEndPoint);
-				m_shotPos.rotation = Quaternion.Euler(330,-270-m_angle,0);
+					m_angle = Cal_angle (m_mouseStartPoint, m_mouseEndPoint);
+				
+					//		Debug.Log(Time.realtimeSinceStartup);
 
+
+					angleByTime = 346.5f - (time * 50);
+				
+				m_shotPos.rotation = Quaternion.Euler (angleByTime, -270 - m_angle, 0);
+				
+					//Debug.Log (m_shotPos.rotation);
+
+					// Maximum force and angle
+					if (force > 6200f){
+						angleByTime = 345;
+						force = 6200f;
+					}
+
+					// Minumum force and angle
+					else if (force < 3100){
+						force = 1800f;
+							angleByTime = 325;
+					}
+
+					Debug.Log (force);
+					Debug.Log (angleByTime);
+
+					m_shotPos.rotation = Quaternion.Euler (angleByTime, -270 - m_angle, 0);
+
+					m_shot.useGravity = true;
 					// Throw ball
-				m_shot.AddForce(m_shotPos.forward * m_distance * m_shotForce);
-				//m_shot.GetComponent<DeleteSelf>().SetDestroy(true);
-
+					m_shot.AddForce (m_shotPos.forward * force * m_shotForce);
+				
+					//	Debug.Log ("FORCE:  "  + ((m_distance/time)).ToString());
+					//m_shot.GetComponent<DeleteSelf>().SetDestroy(true);
+				
 					//Count number ball that throw
-				m_score++;
+				
+					// Close line
+					//	gameObject.GetComponent<Drawline>().SetEnable(false);
+					//	m_distance = 0;
+				
+					m_shot.GetComponent<DragBall> ().SetShot (true, false);
 
-				// Close line
-				gameObject.GetComponent<Drawline>().SetEnable(false);
-				m_distance = 0;
+
+				}
 			}
 		}
 	}
@@ -143,28 +214,14 @@ public class Shooter : MonoBehaviour
 
 	//Create Label show scores
 	void OnGUI(){
-		float x;
-		float y;
-
 		GUIStyle myStyle = new GUIStyle();
 		myStyle.fontSize = 40;
 		myStyle.normal.textColor=Color.white;
 		GUI.Label (new Rect (10, 10, 100, 100), "Ball: " + m_score , myStyle);
 
-		myStyle.normal.textColor=Color.red;
-		myStyle.fontSize = 50;
-
-		// Set x y for create Text Max Force
-		if (m_distance >= (Screen.height * 0.65f) - 5) {
-			if (Screen.height - m_mouseStartPoint.y - 10 > Screen.height - 50)
-				y = Screen.height - 50;
-			else {
-				y = Screen.height - m_mouseStartPoint.y - 10;
-			}
-
-			x = m_mouseStartPoint.x - 110;
-			GUI.Label (new Rect ( x, y, 100, 100), "Max Force" , myStyle);
-		}
+		myStyle.fontSize = 40;
+		myStyle.normal.textColor=Color.white;
+		GUI.Label (new Rect (10, 50, 100, 100), "Can : " + PlayerPrefs.GetInt("Can") , myStyle);
 
 	}
 

@@ -28,6 +28,8 @@ public class Drawline : MonoBehaviour {
 	public void SetOrigin(Vector3 origin){
 		m_origin = origin;
 
+//		Debug.Log ("ORIGIN : " + m_origin);
+
 		m_lineRenderer.SetPosition(0, m_origin);
 	}
 

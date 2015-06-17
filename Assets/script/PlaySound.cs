@@ -7,12 +7,13 @@ public class PlaySound : MonoBehaviour {
 	AudioClip m_sound1;
 	// Use this for initialization
 
-	void Start(){
+	void Update(){
 		m_audio1 = gameObject.GetComponent<AudioSource>();
 	}
 
 	void OnCollisionEnter ()
 	{
-		m_audio1.PlayOneShot (m_audio1.clip,1f);
+		if(m_audio1 != null)
+			m_audio1.PlayOneShot (m_audio1.clip,1f);
 	}
 }

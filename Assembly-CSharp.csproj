@@ -46,8 +46,10 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\script\CreateCan.cs" />
      <Compile Include="Assets\script\DeleteSelf.cs" />
      <Compile Include="Assets\script\DestroyCan.cs" />
+     <Compile Include="Assets\script\DragBall.cs" />
      <Compile Include="Assets\script\Drawline.cs" />
      <Compile Include="Assets\script\GameOver.cs" />
      <Compile Include="Assets\script\PlayGame.cs" />

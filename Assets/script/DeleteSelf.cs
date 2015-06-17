@@ -3,35 +3,26 @@ using System.Collections;
 
 public class DeleteSelf : MonoBehaviour {
 
-	// Use this for initialization
 	private bool m_destroy = false;
-	public float m_delay;
-	
-	void OnCollisionEnter (Collision col)
-	{
-		m_destroy = true;
-		m_delay = 4f;
-	}
 
-	public IEnumerator DestroyObj(){
-		yield return new WaitForSeconds(m_delay);
-		Destroy (gameObject);
-	}	
-
-	public void SetDestroy(bool destroy){
-		m_destroy = destroy;
-	}
-
-	public void SetDelay(float delay){
-		m_delay = delay;
-	}
-
+	// Use this for initialization
 	void Update(){
-		if (m_destroy) {
-			StartCoroutine (DestroyObj ());
-		}
-
-		if(transform.position.y < -50 || transform.position.z > 150)
+		if (transform.position.y < -50 || transform.position.z > 150) {
+			gameObject.GetComponent<DragBall>().SetShot(false, false);
 			Destroy (gameObject);
+		}
+	}
+
+	void OnCollisionEnter() {
+		if (!m_destroy) {
+			Debug.Log ("DESTROY BALLLLL");
+			StartCoroutine(DestroyBall());
+		}
+	}
+
+	private IEnumerator DestroyBall(){
+		m_destroy = true;
+		yield return new WaitForSeconds(3f);
+		Destroy (gameObject);
 	}
 }
