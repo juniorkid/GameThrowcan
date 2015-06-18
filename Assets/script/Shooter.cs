@@ -64,7 +64,10 @@ public class Shooter : MonoBehaviour
 	private IEnumerator CraeteBall(){
 		m_score++;
 		yield return new WaitForSeconds (0.5f);
-		if (m_score == 55) {
+
+		// Limit Ball
+
+		if (m_score == 5) {
 			gameObject.GetComponent<GameOver> ().SetGameover (true);
 		} else {
 			m_shot = Instantiate (m_projectile, new Vector3 (0f, -5.5f, 15), m_shotPos.rotation) as Rigidbody;
@@ -151,9 +154,9 @@ public class Shooter : MonoBehaviour
 					//Debug.Log (m_shotPos.rotation);
 
 					// Maximum force and angle
-					if (force > 6200f){
+					if (force > 6000f){
 						angleByTime = 345;
-						force = 6200f;
+						force = 6000f;
 					}
 
 					// Minumum force and angle

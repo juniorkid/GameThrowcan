@@ -8,6 +8,8 @@ public class CreateCan : MonoBehaviour {
 	public int m_level;
 	private Vector3[] m_posLevelCan;
 
+	public GameObject m_floor;
+
 	private bool m_checkCan;
 
 	// Use this for initialization
@@ -20,6 +22,7 @@ public class CreateCan : MonoBehaviour {
 		m_posLevelCan [3] = new Vector3 (-1.25f, 0.28f, 49.53f);
 		m_posLevelCan [4] = new Vector3 (-2.52f, 0.28f, 49.53f);
 		Instantiate (m_levelCan[m_level], m_posLevelCan[m_level], Quaternion.identity);
+		m_floor.transform.localScale = new Vector3 ( 7f, 0.1f, 2f);
 		m_level ++;
 		m_checkCan = false;
 	}
@@ -28,6 +31,7 @@ public class CreateCan : MonoBehaviour {
 	void Update () {
 		if (GameObject.FindWithTag ("Can") == null) {
 			if(m_level < 5){
+				m_floor.transform.localScale = new Vector3 ( 10f, 0.1f, 2f);
 				Instantiate (m_levelCan [m_level], m_posLevelCan [m_level], Quaternion.identity);
 				m_level ++;
 				Debug.Log (m_level);
@@ -35,6 +39,7 @@ public class CreateCan : MonoBehaviour {
 			else{
 				gameObject.GetComponent<GameOver>().SetGameover(true);
 			}
+
 		} 
 	}
 
